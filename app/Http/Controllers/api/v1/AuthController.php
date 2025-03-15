@@ -43,7 +43,6 @@ class AuthController extends Controller
             throw ValidationException::withMessages([
                 'email' => ['Credenciais inválidas.'],
             ]);
-            return redirect()->route('contacts');
         }
 
         return response()->json([

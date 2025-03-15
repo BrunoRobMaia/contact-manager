@@ -164,6 +164,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    async function fetchContacts() {
+      fetch('/api/v1/contacts', {
+          method: 'GET',
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token'), // Token obtido no login
+            'Accept': 'application/json',
+          },
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Erro:', error));
+    }
     async function login() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -193,6 +205,7 @@
 
         if (data.token) {
           localStorage.setItem("token", data.token);
+          window.location.href = "contacts";
         } else {
           errorMessage.textContent = "Token não recebido!";
         }
