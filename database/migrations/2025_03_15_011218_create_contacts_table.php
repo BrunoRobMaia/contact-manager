@@ -14,8 +14,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone');
             $table->string('email')->nullable();
-            $table->text('notes')->nullable();
+            $table->text('obervations')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
     public function down(): void

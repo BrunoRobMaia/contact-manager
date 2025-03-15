@@ -25,19 +25,29 @@
             </ul>
         </div>
 
+
+
         <!-- Main Content -->
         <div class="main-content">
             <h3 class="text-center mb-4">📇 Meus Contatos</h3>
-            <button class="btn btn-primary mb-3" onclick="openModal()">
-                ➕ Adicionar Contato
-            </button>
-
-            <!-- Lista de Contatos -->
+            <div class="buttons-top">
+                <button class="btn btn-primary mb-3" onclick="openModal()">
+                    ➕ Adicionar Contato
+                </button>
+                <div class="mb-3">
+                    <label for="contact-filter" class="form-label">Filtrar Contatos</label>
+                    <select id="contact-filter" class="form-select" onchange="loadContacts()">
+                        <option value="active">Ativos</option>
+                        <option value="deleted">Excluídos</option>
+                        <option value="all">Todos</option>
+                    </select>
+                </div>
+            </div>
             <ul id="contact-list" class="list-group"></ul>
         </div>
     </div>
 
-    <!-- Modal de Adição/Alteração de Contato -->
+
     <div class="modal fade" id="contactModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -66,10 +76,11 @@
                         id="contact-email"
                         class="form-control mb-2"
                         placeholder="Email" />
-                    <textarea
+                    <input
+                        type='text'
                         id="contact-notes"
                         class="form-control"
-                        placeholder="Observações"></textarea>
+                        placeholder="Observações"></input>
                 </div>
                 <div class="modal-footer">
                     <button

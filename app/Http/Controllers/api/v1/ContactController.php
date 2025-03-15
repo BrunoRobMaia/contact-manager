@@ -9,7 +9,28 @@ class ContactController extends Controller
 {
     public function index(Request $request)
     {
-        return $request->user()->contacts()->whereNull('deleted_at')->get();
+        $query = $request->user()->contacts();
+
+        if ($request->has('filter')) {
+            switch ($request->filter) {
+                case 'deleted': // Contatos excluídos
+                    $query->onlyTrashed();
+                    break;
+                case 'active': // Contatos ativos
+                    $query->whereNull('deleted_at');
+                    break;
+                case 'all': // Todos os contatos (ativos e excluídos)
+                    $query->withTrashed();
+                    break;
+                default: // Fallback para contatos ativos
+                    $query->whereNull('deleted_at');
+                    break;
+            }
+        } else {
+            $query->whereNull('deleted_at'); // Padrão: mostrar apenas os ativos
+        }
+
+        return response()->json($query->get());
     }
     public function showContactsPage()
     {

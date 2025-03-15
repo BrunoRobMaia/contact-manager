@@ -3,6 +3,10 @@ const contactModal = new bootstrap.Modal(
     document.getElementById("contactModal")
 );
 
+document.addEventListener("DOMContentLoaded", function () {
+    loadContacts();
+});
+
 async function loadContacts() {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -10,8 +14,14 @@ async function loadContacts() {
         return;
     }
 
+    const filter = document.getElementById("contact-filter").value;
+    let url = "http://localhost:8000/api/v1/contacts";
+    if (filter !== "all") {
+        url += `?filter=${filter}`;
+    }
+
     try {
-        const res = await fetch("http://localhost:8000/api/v1/contacts", {
+        const res = await fetch(url, {
             headers: {
                 Authorization: "Bearer " + token,
             },
@@ -31,19 +41,37 @@ function renderContacts(contacts) {
     const contactList = document.getElementById("contact-list");
     contactList.innerHTML = "";
 
+    if (contacts.length === 0) {
+        contactList.innerHTML =
+            "<li class='list-group-item text-center'>Nenhum contato encontrado.</li>";
+        return;
+    }
+
     contacts.forEach((contact) => {
         const li = document.createElement("li");
-        li.className = "list-group-item";
+        li.className =
+            "list-group-item d-flex justify-content-between align-items-center overflow-auto fixed-height-item";
         li.setAttribute("data-id", contact.id);
         li.innerHTML = `
             <div>
                 <strong>${contact.name}</strong> - ${contact.phone}
                 <br><small>${contact.email}</small>
-                <br><small>${contact.observations}</small>
+                <br><small>${
+                    contact.observations || "Nenhuma observação"
+                }</small>
             </div>
             <div>
-                <button class="btn btn-warning btn-sm" onclick="editContact(${contact.id})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteContact(${contact.id})">Excluir</button>
+                ${
+                    contact.deleted_at
+                        ? "<span class='badge bg-danger'>Excluído</span>"
+                        : ""
+                }
+                <button class="btn btn-warning btn-sm" onclick="editContact(${
+                    contact.id
+                })">✏️ Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteContact(${
+                    contact.id
+                })">🗑️ Excluir</button>
             </div>
         `;
         contactList.appendChild(li);
@@ -84,13 +112,29 @@ function editContact(contactId) {
     openModal(contactId);
 }
 
+function isValidEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailPattern.test(email);
+}
+
 async function saveContact() {
     const token = localStorage.getItem("token");
+    const name = document.getElementById("contact-name").value;
+    const phone = document.getElementById("contact-phone").value;
+    const email = document.getElementById("contact-email").value;
+    const observations = document.getElementById("contact-notes").value;
+
+    // Validar email
+    if (!isValidEmail(email)) {
+        alert("Por favor, insira um email válido.");
+        return;
+    }
+
     const data = {
-        name: document.getElementById("contact-name").value,
-        phone: document.getElementById("contact-phone").value,
-        email: document.getElementById("contact-email").value,
-        observations: document.getElementById("contact-notes").value,
+        name,
+        phone,
+        email,
+        observations,
     };
 
     try {
