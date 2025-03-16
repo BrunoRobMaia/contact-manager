@@ -35,6 +35,15 @@
                     ➕ Adicionar Contato
                 </button>
                 <div class="mb-3">
+
+                    <input
+                        type="text"
+                        id="search-contact"
+                        class="form-control"
+                        placeholder="Digite o nome do contato"
+                        oninput="loadContacts()" />
+                </div>
+                <div class="mb-3">
                     <label for="contact-filter" class="form-label">Filtrar Contatos</label>
                     <select id="contact-filter" class="form-select" onchange="loadContacts()">
                         <option value="active">Ativos</option>
@@ -42,8 +51,9 @@
                         <option value="all">Todos</option>
                     </select>
                 </div>
+
             </div>
-            <ul id="contact-list" class="list-group"></ul>
+            <ul id="contact-list" class="contact-list"></ul>
         </div>
     </div>
 

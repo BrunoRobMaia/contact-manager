@@ -43,6 +43,10 @@ async function loadContacts() {
     }
 
     const filter = document.getElementById("contact-filter").value;
+    const searchQuery = document
+        .getElementById("search-contact")
+        .value.toLowerCase();
+
     let url = "http://localhost:8000/api/v1/contacts";
     if (filter !== "all") {
         url += `?filter=${filter}`;
@@ -58,7 +62,12 @@ async function loadContacts() {
         if (!res.ok) throw new Error("Erro ao carregar contatos");
 
         const data = await res.json();
-        renderContacts(data);
+
+        const filteredContacts = data.filter((contact) =>
+            contact.name.toLowerCase().includes(searchQuery)
+        );
+
+        renderContacts(filteredContacts);
     } catch (error) {
         console.error("Erro ao carregar contatos:", error);
         alert("Erro ao carregar contatos. Tente novamente.");
@@ -165,7 +174,6 @@ async function saveContact() {
     const email = document.getElementById("contact-email").value;
     const observations = document.getElementById("contact-notes").value;
 
-    // Validar email
     if (!isValidEmail(email)) {
         alert("Por favor, insira um email válido.");
         return;

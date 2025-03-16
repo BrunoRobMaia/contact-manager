@@ -103,7 +103,6 @@ body {
     padding: 6px 10px;
 }
 
-/* Modal estilizado */
 .modal-content {
     background-color: var(--bg-light-dark);
     border-radius: 12px;
@@ -141,4 +140,11 @@ textarea:focus {
     border-color: var(--primary);
     outline: none;
     box-shadow: 0 0 5px rgba(0, 170, 255, 0.5);
+}
+.contact-list {
+    max-height: 70vh;
+    overflow-y: auto; 
+    border: 1px solid var(--bg-light-dark);
+    padding: 10px;
+    border-radius: 5px;
 }
