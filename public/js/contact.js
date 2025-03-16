@@ -2,7 +2,42 @@ let editingContactId = null;
 const contactModal = new bootstrap.Modal(
     document.getElementById("contactModal")
 );
+document.getElementById("exportCsvBtn").addEventListener("click", function () {
+    exportContactsToExcel();
+});
 
+async function exportContactsToExcel() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            "http://localhost:8000/api/v1/export-excel",
+            {
+                headers: {
+                    Authorization: "Bearer " + token,
+                },
+            }
+        );
+
+        if (!response.ok) throw new Error("Erro ao exportar contatos");
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "contatos.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    } catch (error) {
+        console.error("Erro ao exportar contatos:", error);
+        alert("Erro ao exportar contatos. Tente novamente.");
+    }
+}
 document.addEventListener("DOMContentLoaded", function () {
     loadContacts();
     document
@@ -133,28 +168,37 @@ function openModal(contactId = null) {
     document.getElementById("modalTitle").textContent = contactId
         ? "Editar Contato"
         : "Adicionar Contato";
+
     if (contactId) {
         const contact = document.querySelector(
             `#contact-list li[data-id="${contactId}"]`
         );
-        document.getElementById("contact-name").value =
-            contact.querySelector("strong").textContent;
-        document.getElementById("contact-phone").value = contact
-            .querySelector("div")
-            .textContent.split(" - ")[1]
-            .trim();
-        document.getElementById("contact-email").value = contact
-            .querySelector("small")
-            .textContent.trim();
-        document.getElementById("contact-notes").value = contact
-            .querySelectorAll("small")[1]
-            .textContent.trim();
+
+        if (!contact) return;
+
+        const name = contact.querySelector("strong").textContent.trim();
+        const email = contact.querySelector("small").textContent.trim();
+
+        const phoneText = contact.innerHTML.match(
+            /- (\(\d{2}\)\d{1}\.\d{4}-\d{4}|\(\d{2}\)\d{4}-\d{4})/
+        );
+        const phone = phoneText ? phoneText[1] : "";
+
+        const smallElements = contact.querySelectorAll("small");
+        const observations =
+            smallElements.length > 1 ? smallElements[1].textContent.trim() : "";
+
+        document.getElementById("contact-name").value = name;
+        document.getElementById("contact-phone").value = phone;
+        document.getElementById("contact-email").value = email;
+        document.getElementById("contact-notes").value = observations;
     } else {
         document.getElementById("contact-name").value = "";
         document.getElementById("contact-phone").value = "";
         document.getElementById("contact-email").value = "";
         document.getElementById("contact-notes").value = "";
     }
+
     contactModal.show();
 }
 
@@ -234,5 +278,5 @@ async function deleteContact(contactId) {
 
 function logout() {
     localStorage.removeItem("token");
-    window.location.href = "login.html";
+    window.location.href = "login";
 }

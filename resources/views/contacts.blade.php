@@ -27,7 +27,6 @@
 
 
 
-        <!-- Main Content -->
         <div class="main-content">
             <h3 class="text-center mb-4">📇 Meus Contatos</h3>
             <div class="buttons-top">
@@ -51,7 +50,9 @@
                         <option value="all">Todos</option>
                     </select>
                 </div>
-
+                <div class="mb-3">
+                    <button id="exportCsvBtn" class="btn btn-primary">📤 Exportar CSV</button>
+                </div>
             </div>
             <ul id="contact-list" class="contact-list"></ul>
         </div>
