@@ -5,7 +5,35 @@ const contactModal = new bootstrap.Modal(
 
 document.addEventListener("DOMContentLoaded", function () {
     loadContacts();
+    document
+        .getElementById("contact-phone")
+        .addEventListener("input", function (e) {
+            e.target.value = formatPhoneNumber(e.target.value);
+        });
 });
+
+function formatPhoneNumber(phone) {
+    const cleaned = ("" + phone).replace(/\D/g, "");
+    if (cleaned.length === 11) {
+        return cleaned.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, "($1)$2.$3-$4");
+    } else if (cleaned.length === 10) {
+        return cleaned.replace(/(\d{2})(\d{4})(\d{4})/, "($1)$2-$3");
+    } else {
+        return phone;
+    }
+}
+
+function formatDateTime(dateTimeString) {
+    const date = new Date(dateTimeString);
+    return date.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    });
+}
 
 async function loadContacts() {
     const token = localStorage.getItem("token");
@@ -54,17 +82,30 @@ function renderContacts(contacts) {
         li.setAttribute("data-id", contact.id);
         li.innerHTML = `
             <div>
-                <strong>${contact.name}</strong> - ${contact.phone}
+                <strong>${contact.name}</strong> - ${formatPhoneNumber(
+            contact.phone
+        )}
                 <br><small>${contact.email}</small>
                 <br><small>${
                     contact.observations || "Nenhuma observação"
                 }</small>
+                ${
+                    contact.deleted_at
+                        ? `<br><small>${formatDateTime(
+                              contact.deleted_at
+                          )}</small>`
+                        : `<br><small>${formatDateTime(
+                              contact.created_at
+                          )}</small>`
+                }
+                
+                
             </div>
             <div>
                 ${
                     contact.deleted_at
-                        ? "<span class='badge bg-danger'>Excluído</span>"
-                        : ""
+                        ? `<span class='badge bg-danger'>Excluído</span>`
+                        : "<span class='badge bg-success'>Ativo</span>"
                 }
                 <button class="btn btn-warning btn-sm" onclick="editContact(${
                     contact.id

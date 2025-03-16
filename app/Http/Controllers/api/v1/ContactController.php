@@ -13,21 +13,21 @@ class ContactController extends Controller
 
         if ($request->has('filter')) {
             switch ($request->filter) {
-                case 'deleted': // Contatos excluídos
+                case 'deleted':
                     $query->onlyTrashed();
                     break;
-                case 'active': // Contatos ativos
+                case 'active':
                     $query->whereNull('deleted_at');
                     break;
-                case 'all': // Todos os contatos (ativos e excluídos)
+                case 'all':
                     $query->withTrashed();
                     break;
-                default: // Fallback para contatos ativos
+                default:
                     $query->whereNull('deleted_at');
                     break;
             }
         } else {
-            $query->whereNull('deleted_at'); // Padrão: mostrar apenas os ativos
+            $query->withTrashed();
         }
 
         return response()->json($query->get());
